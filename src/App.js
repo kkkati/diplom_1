@@ -1,25 +1,70 @@
-import logo from './logo.svg';
-import './App.css';
+import { Routes, Route } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { setUser } from "./actions";
+import { useLayoutEffect } from "react";
+import { Header, Footer } from "./components";
+import styled from "styled-components";
+import {
+  Authorization,
+  Basket,
+  Main,
+  Registration,
+  AdminPanel,
+  Product,
+} from "./pages";
 
-function App() {
+const AppColumn = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  width: 1250px;
+  min-height: 100%;
+  margin: 0 auto;
+  background-color: #ffffff;
+  font-family: "Comfortaa", cursive;
+`;
+
+const Page = styled.div`
+  padding: 120px 0 20px;
+  // background-color: #edc7b7;
+`;
+
+export const App = () => {
+  const dispatch = useDispatch();
+
+  useLayoutEffect(() => {
+    const currentUserDataJSON = sessionStorage.getItem("userData");
+    if (!currentUserDataJSON) {
+      return;
+    }
+
+    const currentUserData = JSON.parse(currentUserDataJSON);
+
+    dispatch(
+      setUser({
+        ...currentUserData,
+        roleId: Number(currentUserData.roleId),
+      })
+    );
+  }, [dispatch]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <AppColumn>
+      <Header />
+      <Page>
+        <Routes>
+          <Route path="/" element={<Main />} />
+          <Route path="/login" element={<Authorization />} />
+          <Route path="/register" element={<Registration />} />
+          <Route path="/basket" element={<Basket />} />
+          <Route path="/admin" element={<AdminPanel />} />
+          <Route path="/product/:id" element={<Product />} />
+        </Routes>
+      </Page>
+      <Footer />
+    </AppColumn>
   );
-}
+};
 
 export default App;
